@@ -235,17 +235,31 @@ It never places orders.</p>
 
 
 def send_telegram(text):
+    """Send the alert to ntfy (phone app) and/or Telegram, whichever is set."""
+    sent = False
+    topic = os.environ.get("NTFY_TOPIC", "").strip()
+    if topic:
+        r = requests.post(
+            f"https://ntfy.sh/{topic}",
+            data=text.encode("utf-8"),
+            headers={"Title": "Bullish F&O stocks"},
+            timeout=20,
+        )
+        print("ntfy status:", r.status_code)
+        r.raise_for_status()
+        sent = True
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat = os.environ.get("TELEGRAM_CHAT_ID")
-    if not token or not chat:
-        print("Telegram secrets not set; printing instead:\n" + text)
-        return
-    r = requests.post(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        data={"chat_id": chat, "text": text}, timeout=20,
-    )
-    print("Telegram status:", r.status_code)
-    r.raise_for_status()
+    if token and chat:
+        r = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            data={"chat_id": chat, "text": text}, timeout=20,
+        )
+        print("Telegram status:", r.status_code)
+        r.raise_for_status()
+        sent = True
+    if not sent:
+        print("No alert channel set; printing instead:\n" + text)
 
 
 def main():
