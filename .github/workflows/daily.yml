@@ -2,8 +2,8 @@ name: Daily bullish F&O screen
 
 on:
   schedule:
-    # 03:30 UTC = 09:00 IST, Monday to Friday (GitHub can start a few minutes late)
-    - cron: "30 3 * * 1-5"
+    # 02:30 UTC = 08:00 IST, Monday to Friday (GitHub can start a few minutes late)
+    - cron: "30 2 * * 1-5"
   workflow_dispatch:   # lets you run it by hand from the Actions tab
 
 permissions:
